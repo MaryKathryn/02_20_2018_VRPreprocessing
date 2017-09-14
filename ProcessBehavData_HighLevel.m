@@ -111,7 +111,13 @@ function ProcessBehavData_HighLevel(varargin)
 % forward should be dated and documented here. 
 % 
 % Change log: 
-% 
+% - 20170914, by Rogelio Luna. A subfunction to look for the session folder
+%   that will be processed was added. This is called from the Task loop
+%   section. If the folder is not found, the loop skip it and continues to
+%   next task in line.
+% - 20170913, by Rogelio Luna. Minor style and typo corrections done.
+%   "KMTasks_PrepBehavData" function added to prep data from "KeyMap" and
+%   "KeyMapWM" tasks.
 % *************************************************************************
 
 %% Initialization
@@ -183,27 +189,45 @@ for monkey = 1:length(monkeyNames)
         dirDataSess = [dirData monkeyName sl sessions{sess} sl];
 
         
+        % Task loop.
         % CALLS TO TASK-SPECIFIC LOW-LEVEL FUNCTIONS
         for task = 1:length(taskNames)
             
             taskStruct = struct();
             taskName = taskNames{task};
+            go = thereisfolder;             % Check that folder exists...
+            if ~go, continue, end
             
             switch taskName
                 case 'AL'
                     ALVR_PrepALData(dirDataSess,bSave)
                 case 'EyeCal'
-                    CSTask_PrepEyeCalEndData(dirDataSess,'EyeCal',bSave)
+                    CSTask_PrepEyeCalEndData(dirDataSess, 'EyeCal',bSave)
                 case 'EyeEnd'
-                    CSTask_PrepEyeCalEndData(dirDataSess,'EyeEnd',bSave)
+                    CSTask_PrepEyeCalEndData(dirDataSess, 'EyeEnd',bSave)
+                case 'KeyMap'
+                    KMTasks_PrepBehavData(dirDataSess, 'KeyMap', bSave)
+                case 'KeyMapWM'
+                    KMTasks_PrepBehavData(dirDataSess, 'KeyMapWM', bSave)
             end
-            
-            
-        end
-        
-        
+
+        end % task loop
+
         display(['Done processing ' num2str(sess) ' of ' num2str(length(sessions)) ' sessions.'])
     end % session loop
 end % monkey loop
+
+%% ===== Subfunctions =====
+    function [go] = thereisfolder
+        if exist([dirDataSess taskName],'dir')
+            disp(['Processing folder ' dirDataSess taskName])
+            go = true;
+        else
+            disp(['Folder ' dirDataSess taskName ' was not found!'])
+            go = false;
+            pause(2)
+            disp(' ')
+        end
+    end % thereisfolder subfunction
 
 end % function
