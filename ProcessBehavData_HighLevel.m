@@ -118,6 +118,7 @@ function ProcessBehavData_HighLevel(varargin)
 % - 20170913, by Rogelio Luna. Minor style and typo corrections done.
 %   "KMTasks_PrepBehavData" function added to prep data from "KeyMap" and
 %   "KeyMapWM" tasks.
+%  -20170915 - addition to task KeyMapWM to process multiple files of the same task type
 % *************************************************************************
 
 %% Initialization
@@ -209,6 +210,12 @@ for monkey = 1:length(monkeyNames)
                     KMTasks_PrepBehavData(dirDataSess, 'KeyMap', bSave)
                 case 'KeyMapWM'
                     KMTasks_PrepBehavData(dirDataSess, 'KeyMapWM', bSave)
+                       files = dir(dirDataSess);
+                       files = {files.name};
+                       folders_of_interest = find(cell2mat(cellfun(@(x)(any(regexpi(x,taskName))),files,'uni',0)));
+                        for folder_number = 1:length(folders_of_interest)
+                           KMTasks_PrepBehavData(dirDataSess, files{folders_of_interest(folder_number)}, bSave)
+                       end
             end
 
         end % task loop
