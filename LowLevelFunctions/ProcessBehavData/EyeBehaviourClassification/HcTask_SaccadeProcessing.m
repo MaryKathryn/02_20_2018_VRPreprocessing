@@ -8,6 +8,13 @@ function [SacStructOut] = HcTask_SaccadeProcessing(SacStructInput,bPreSmoothed)
 %   SacStructInput=BigStruct.(Types{sessionType}).Trials.(trialIDs{trl}).EyeDegrees
 %    SacStructInput=BigStruct.(Types{sessionType}).Trials.(trialIDs{trl}).NonSmoothedEyes
 
+% Input checking:
+if isempty(SacStructInput)
+    SacStructOut = [];
+    disp('HCTASK_SACCADEPROCESSING: No input information to process')
+    return
+end
+
 %number of samples to exceed to count as a saccade (10ms)
 durationThresh = 4;
 
