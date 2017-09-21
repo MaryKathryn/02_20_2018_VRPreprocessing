@@ -196,7 +196,9 @@ for trl = 1:numel(ValidTrials)
                 end
                 
                 % Retrieves task's parameters:
-                Task_Params.FailDelay       = events{k}.txt_FailDelay;
+                if isfield(events{k}, 'txt_FailDelay')
+                    Task_Params.FailDelay       = events{k}.txt_FailDelay;
+                end
                 Task_Params.WMPercent       = events{k}.txt_HidePercent;
                 Task_Params.RT              = events{k}.txt_RT;
                 Task_Params.WMenabled       = events{k}.chk_HideTarget;
