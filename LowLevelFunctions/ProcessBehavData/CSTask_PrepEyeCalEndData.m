@@ -27,7 +27,12 @@ hWaitBar = waitbar(0, ['Going through Eye' taskName ' trials.']);
 %Changes added do address the fact that Monkey lab used to do smoothing 
 
 % load the EDF file that has the eye samples for the whole session
-edfEyeSamplefile = edfmex(char([dirTask sl EDFFile{1}] ));
+if ~isempty(EDFFile)
+    edfEyeSamplefile = edfmex(char([dirTask sl EDFFile{1}]));
+else
+    edfEyeSamplefile = [];
+    disp('EDF file was not found. Bad eye samples will be used instead ...')
+end
 StartIndexEyeSamples = 1;
 
 %Load all trials
@@ -57,6 +62,9 @@ for trl = 1:numel(ValidTrials)
     Eye_ScreenHeight    = [];
     Eye_ScreenWidth     = [];
     Eye_ScreenDistance  = [];
+    UsingBadES          = false; % It remarks whether bad EyeSamples will be used, instead of
+                                 % eye data from the EDF file.
+                                 
     %% Load the EyeData from the EDF
     % the smaples are in FSamples, but the events are in FEvent. For each
     % trial, the name has to be gotten, 
@@ -243,12 +251,18 @@ for trl = 1:numel(ValidTrials)
     % (the end of the last trial) and the end of this trial. get the
     % indices of these times, and then get the eye samples for these
     % periods
-     Trl_EOTEDF = find(edfEyeSamplefile.FSAMPLE.time<(Trl_EOT-Eye_EDFtimeDiff(1))*1000,1,'last');
-    Eye_Samples = [double(edfEyeSamplefile.FSAMPLE.hx(1,StartIndexEyeSamples:Trl_EOTEDF))' ...
+    if ~isempty(edfEyeSamplefile)
+        Trl_EOTEDF = find(edfEyeSamplefile.FSAMPLE.time<(Trl_EOT-Eye_EDFtimeDiff(1))*1000,1,'last');
+        Eye_Samples = [double(edfEyeSamplefile.FSAMPLE.hx(1,StartIndexEyeSamples:Trl_EOTEDF))' ...
         double(edfEyeSamplefile.FSAMPLE.hy(1,StartIndexEyeSamples:Trl_EOTEDF))'...
         double(edfEyeSamplefile.FSAMPLE.time(StartIndexEyeSamples:Trl_EOTEDF))'*.001+Eye_EDFtimeDiff(1)...
                 double(edfEyeSamplefile.FSAMPLE.pa(1,StartIndexEyeSamples:Trl_EOTEDF))']; 
-            StartIndexEyeSamples = Trl_EOTEDF+1;
+        StartIndexEyeSamples = Trl_EOTEDF+1;
+    else
+        Eye_Samples = Eye_SamplesBad;
+        UsingBadES = true;
+    end
+    
     if ~strcmp(Trl_TrialID,'000000000000000')
         
         % Session-specific information
@@ -282,6 +296,7 @@ for trl = 1:numel(ValidTrials)
         taskStruct.Trials.(['ID_' Trl_TrialID]).SOT_Time       = Trl_SOT;             % (6)
         taskStruct.Trials.(['ID_' Trl_TrialID]).EOT_Time       = Trl_EOT;             % (7)
         taskStruct.Trials.(['ID_' Trl_TrialID]).SyncPulse      = Sync_Pulse;          %
+        taskStruct.Trials.(['ID_' Trl_TrialID]).UsingBadES     = UsingBadES;
         taskStruct.Trials.(['ID_' Trl_TrialID]).RewardDuration = RewardDuration;          %Reward_Duration 
         
         
