@@ -111,6 +111,8 @@ function ProcessBehavData_HighLevel(varargin)
 % forward should be dated and documented here. 
 % 
 % Change log: 
+% - 20170921, by Rogelio Luna. "ODRTask_PrepBehavData" function added to prep data
+%   from ODR task.
 % - 20170914, by Rogelio Luna. A subfunction to look for the session folder
 %   that will be processed was added. This is called from the Task loop
 %   section. If the folder is not found, the loop skip it and continues to
@@ -213,9 +215,11 @@ for monkey = 1:length(monkeyNames)
                        files = dir(dirDataSess);
                        files = {files.name};
                        folders_of_interest = find(cell2mat(cellfun(@(x)(any(regexpi(x,taskName))),files,'uni',0)));
-                        for folder_number = 1:length(folders_of_interest)
+                       for folder_number = 1:length(folders_of_interest)
                            KMTasks_PrepBehavData(dirDataSess, files{folders_of_interest(folder_number)}, bSave)
                        end
+                case {'ODR', 'ODRTask'}
+                    ODRTask_PrepBehavData(dirDataSess, taskName, bSave)
             end
 
         end % task loop
