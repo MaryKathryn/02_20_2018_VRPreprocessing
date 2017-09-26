@@ -370,7 +370,9 @@ for trl = 1:numel(ValidTrials)
         taskStruct.Trials.(['ID_' Trl_TrialID]).EOT_Time       = Trl_EOT;             % (7)
         taskStruct.Trials.(['ID_' Trl_TrialID]).SyncPulse      = Sync_Pulse;          %
         taskStruct.Trials.(['ID_' Trl_TrialID]).OutcomeWord    = Trl_Outcome;
-        
+     
+ taskStruct.TrialSummary(trl+1,:) = {['ID_' Trl_TrialID] Trl_Outcome,Task_GoalID};
+   
     end
     
     waitbar(trl/numel(ValidTrials));
