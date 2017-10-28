@@ -13,7 +13,7 @@ function TrlRasters(spikeFile,MLStruct,varargin)
 % Inputs
 %   spikeFile   - String. Full filepath of your spike kdf5 file
 %
-%   MLStruct    - Structure. Behavioural trial strucutre you would like to
+%   MLStruct    - Structure. Behavioural trial structure you would like to
 %                 plot. Because trial epochs are hard-coded in the function
 %                 right now, this version of this structure only works for
 %                 Unreal 3 associative memory tasks (XMaze, ALFixed,
